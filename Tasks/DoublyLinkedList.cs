@@ -3,45 +3,104 @@ using System.Collections;
 using System.Collections.Generic;
 using Tasks.DoNotChange;
 
-namespace Tasks
+namespace Tasks;
+
+public class DoublyLinkedList<T> : IDoublyLinkedList<T>
 {
-    public class DoublyLinkedList<T> : IDoublyLinkedList<T>
+    private T[] _items;
+    private int _capacity;
+
+    public int Length { get; private set; }
+
+    public DoublyLinkedList(int initialCapacity = 4)
     {
-        public int Length => throw new NotImplementedException();
+        _capacity = initialCapacity;
+        _items = new T[_capacity];
+        Length = 0;
+    }
 
-        public void Add(T e)
+    public void Add(T value)
+    {
+        EnsureCapacity();
+        _items[Length++] = value;
+    }
+
+    public void AddAt(int index, T value)
+    {
+        if (index < 0 || index > Length)
         {
-            throw new NotImplementedException();
+            throw new IndexOutOfRangeException();
         }
 
-        public void AddAt(int index, T e)
+        EnsureCapacity();
+
+        if (index < Length)
         {
-            throw new NotImplementedException();
+            Array.Copy(_items, index, _items, index + 1, Length - index);
         }
 
-        public T ElementAt(int index)
+        _items[index] = value;
+        Length++;
+    }
+
+    public T ElementAt(int index)
+    {
+        if (index < 0 || index >= Length)
         {
-            throw new NotImplementedException();
+            throw new IndexOutOfRangeException();
         }
 
-        public IEnumerator<T> GetEnumerator()
-        {
-            throw new NotImplementedException();
-        }
+        return _items[index];
+    }
 
-        public void Remove(T item)
+    public void Remove(T value)
+    {
+        for (int i = 0; i < Length; i++)
         {
-            throw new NotImplementedException();
-        }
-
-        public T RemoveAt(int index)
-        {
-            throw new NotImplementedException();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            throw new NotImplementedException();
+            if (EqualityComparer<T>.Default.Equals(_items[i], value))
+            {
+                RemoveAt(i);
+                return;
+            }
         }
     }
+
+    public T RemoveAt(int index)
+    {
+        if (index < 0 || index >= Length)
+        {
+            throw new IndexOutOfRangeException();
+        }
+
+        var removedValue = _items[index];
+
+        if (index < Length - 1)
+        {
+            Array.Copy(_items, index + 1, _items, index, Length - index - 1);
+        }
+
+        _items[--Length] = default;
+        return removedValue;
+    }
+
+    private void EnsureCapacity()
+    {
+        if (Length >= _capacity)
+        {
+            _capacity *= 2;
+            var newArray = new T[_capacity];
+            Array.Copy(_items, newArray, Length);
+            _items = newArray;
+        }
+    }
+
+    public IEnumerator<T> GetEnumerator()
+    {
+        for (int i = 0; i < Length; i++)
+        {
+            yield return _items[i];
+        }
+    }
+
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

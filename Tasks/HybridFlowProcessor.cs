@@ -1,28 +1,35 @@
 ﻿using System;
 using Tasks.DoNotChange;
 
-namespace Tasks
+namespace Tasks;
+
+public class HybridFlowProcessor<T> : IHybridFlowProcessor<T>
 {
-    public class HybridFlowProcessor<T> : IHybridFlowProcessor<T>
+    private readonly DoublyLinkedList<T> _items = [];
+
+    public void Push(T item)
     {
-        public T Dequeue()
-        {
-            throw new NotImplementedException();
-        }
+        _items.AddAt(0, item);
+    }
 
-        public void Enqueue(T item)
-        {
-            throw new NotImplementedException();
-        }
+    public T Pop()
+    {
+        if (_items.Length == 0)
+            throw new InvalidOperationException("No items to pop.");
 
-        public T Pop()
-        {
-            throw new NotImplementedException();
-        }
+        return _items.RemoveAt(0);
+    }
 
-        public void Push(T item)
-        {
-            throw new NotImplementedException();
-        }
+    public void Enqueue(T item)
+    {
+        _items.Add(item);
+    }
+
+    public T Dequeue()
+    {
+        if (_items.Length == 0)
+            throw new InvalidOperationException("No items to dequeue.");
+
+        return _items.RemoveAt(0);
     }
 }
